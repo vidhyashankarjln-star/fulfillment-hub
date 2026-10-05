@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fulfillment Hub — XYZ Operations</title>
+<style>
+:root{
+  --bg:#f5f7fb; --panel:#fff; --text:#172033; --muted:#667085; --line:#e6e9ef;
+  --nav:#111827; --nav2:#1d2636; --blue:#2563eb; --blue2:#eff6ff; --green:#15803d;
+  --green2:#ecfdf3; --amber:#b45309; --amber2:#fffbeb; --red:#b42318; --red2:#fef3f2;
+  --purple:#6941c6; --purple2:#f4f3ff; --shadow:0 6px 22px rgba(16,24,40,.06);
+}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select{font:inherit} button{cursor:pointer}
+.app{display:flex;min-height:100vh}
+.sidebar{width:238px;background:var(--nav);color:#dbe3ef;padding:22px 14px;position:fixed;inset:0 auto 0 0}
+.logo{font-weight:800;font-size:20px;color:#fff;padding:0 12px 24px;letter-spacing:-.3px}
+.logo span{color:#60a5fa}.side-section{font-size:11px;text-transform:uppercase;color:#8290a5;padding:12px}.nav button{width:100%;border:0;background:none;color:#b9c4d4;text-align:left;padding:11px 12px;border-radius:8px;margin:2px 0;font-weight:600}
+.nav button:hover,.nav button.active{background:var(--nav2);color:#fff}.nav .icon{width:23px;display:inline-block}
+.side-note{position:absolute;left:14px;right:14px;bottom:18px;background:#182234;border:1px solid #263249;border-radius:10px;padding:12px;font-size:12px;line-height:1.45;color:#aeb9c9}
+.main{margin-left:238px;width:calc(100% - 238px);padding:26px 30px 50px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}.title h1{margin:0;font-size:27px;letter-spacing:-.6px}.title p{margin:5px 0 0;color:var(--muted);font-size:14px}
+.date-chip{background:#fff;border:1px solid var(--line);padding:9px 12px;border-radius:8px;font-size:13px;color:#475467}
+.page{display:none}.page.active{display:block}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:17px;box-shadow:var(--shadow)}
+.kpi-label{color:var(--muted);font-size:12px;font-weight:650}.kpi{font-size:28px;font-weight:800;margin:7px 0 2px}.kpi-note{font-size:12px;color:var(--muted)}.kpi-note.red{color:var(--red)}.kpi-note.green{color:var(--green)}
+.grid2{display:grid;grid-template-columns:1.45fr 1fr;gap:18px}.panel{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}.panel-head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}.panel-head h2{font-size:15px;margin:0}.panel-head small{color:var(--muted)}
+.panel-body{padding:16px 18px}
+table{width:100%;border-collapse:collapse;font-size:13px}th{text-align:left;color:#667085;font-size:11px;text-transform:uppercase;letter-spacing:.04em;padding:10px 8px;border-bottom:1px solid var(--line)}td{padding:12px 8px;border-bottom:1px solid #f0f2f5;vertical-align:middle}tr:last-child td{border-bottom:0}
+.badge{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}.b-blue{background:var(--blue2);color:var(--blue)}.b-green{background:var(--green2);color:var(--green)}.b-amber{background:var(--amber2);color:var(--amber)}.b-red{background:var(--red2);color:var(--red)}.b-purple{background:var(--purple2);color:var(--purple)}
+.progress{height:7px;background:#eef1f5;border-radius:99px;overflow:hidden}.progress>span{display:block;height:100%;border-radius:99px;background:var(--blue)}
+.exception{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid #f0f2f5}.exception:last-child{border-bottom:0}.dot{width:9px;height:9px;border-radius:50%;margin-top:5px;background:#f04438}.dot.amber{background:#f79009}.ex-title{font-size:13px;font-weight:700}.ex-meta{font-size:12px;color:var(--muted);margin-top:3px}
+.toolbar{display:flex;gap:9px;align-items:center;margin-bottom:14px;flex-wrap:wrap}.search{background:#fff;border:1px solid var(--line);border-radius:8px;padding:9px 11px;min-width:260px;outline:none}.select{background:#fff;border:1px solid var(--line);border-radius:8px;padding:9px 11px;color:#344054}.btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:9px 12px;font-weight:650;color:#344054}.btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}.btn:hover{filter:brightness(.98)}
+.order-id{font-weight:750;color:#1d4ed8}.muted{color:var(--muted)}
+.inventory-grid{display:grid;grid-template-columns:1.3fr .7fr;gap:18px}.stock-good{color:var(--green);font-weight:700}.stock-low{color:var(--amber);font-weight:700}.stock-zero{color:var(--red);font-weight:800}
+.workflow{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin-bottom:18px}.stage{background:#fff;border:1px solid var(--line);border-radius:10px;padding:13px}.stage-title{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase}.stage-num{font-size:23px;font-weight:800;margin-top:6px}
+.priority{border-left:3px solid #f04438}
+.empty{padding:30px;text-align:center;color:var(--muted);font-size:13px}
+.modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:center;justify-content:center;padding:20px;z-index:20}.modal-backdrop.open{display:flex}.modal{background:#fff;width:min(650px,100%);border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden}.modal-head{padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between}.modal-head h3{margin:0;font-size:17px}.close{border:0;background:none;font-size:20px;color:#667085}.modal-body{padding:20px}.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.detail label{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:4px}.detail div{font-size:14px;font-weight:650}.modal-actions{padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}
+.toast{position:fixed;right:22px;bottom:22px;background:#111827;color:#fff;padding:12px 15px;border-radius:9px;display:none;z-index:30;font-size:13px}.toast.show{display:block}
+@media(max-width:1000px){.sidebar{width:190px}.main{margin-left:190px;width:calc(100% - 190px);padding:20px}.cards{grid-template-columns:repeat(2,1fr)}.grid2,.inventory-grid{grid-template-columns:1fr}.workflow{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:700px){.sidebar{position:static;width:100%;height:auto}.app{display:block}.main{margin:0;width:100%}.side-note{display:none}.cards{grid-template-columns:1fr 1fr}.workflow{grid-template-columns:repeat(2,1fr)}.topbar{align-items:flex-start}.search{min-width:180px}.detail-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo">Fulfillment<span>Hub</span></div>
+    <div class="side-section">Operations</div>
+    <div class="nav">
+      <button class="active" data-page="dashboard"><span class="icon">◈</span> Dashboard</button>
+      <button data-page="orders"><span class="icon">▤</span> Orders</button>
+      <button data-page="inventory"><span class="icon">▦</span> Inventory</button>
+      <button data-page="exceptions"><span class="icon">!</span> Exceptions <span id="exceptionCount"></span></button>
+    </div>
+    <div class="side-section">System</div>
+    <div class="nav">
+      <button data-page="workflow"><span class="icon">↗</span> Workflow</button>
+    </div>
+    <div class="side-note"><b>Shift focus</b><br>Clear exceptions first, then process priority orders before the next courier cutoff.</div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="title"><h1 id="pageTitle">Operations dashboard</h1><p id="pageSubtitle">A single view of today's fulfillment work.</p></div>
+      <div class="date-chip">Demo data · 04 Oct 2026</div>
+    </div>
+
+    <section id="dashboard" class="page active">
+      <div class="cards">
+        <div class="card"><div class="kpi-label">Orders today</div><div class="kpi" id="kpiOrders">248</div><div class="kpi-note">17 priority</div></div>
+        <div class="card"><div class="kpi-label">At risk</div><div class="kpi" id="kpiRisk">9</div><div class="kpi-note red">Needs action before cutoff</div></div>
+        <div class="card"><div class="kpi-label">Ready for pickup</div><div class="kpi" id="kpiReady">36</div><div class="kpi-note">Next pickup 16:30</div></div>
+        <div class="card"><div class="kpi-label">Exceptions</div><div class="kpi" id="kpiExceptions">7</div><div class="kpi-note">3 inventory · 4 fulfillment</div></div>
+      </div>
+      <div class="workflow" id="workflowCards"></div>
+      <div class="grid2">
+        <div class="panel">
+          <div class="panel-head"><h2>Priority orders</h2><button class="btn" onclick="showPage('orders')">View all</button></div>
+          <div class="panel-body" id="priorityTable"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>Needs attention</h2><small>Open exceptions</small></div>
+          <div class="panel-body" id="attentionList"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="orders" class="page">
+      <div class="toolbar">
+        <input class="search" id="orderSearch" placeholder="Search order, customer or SKU…" oninput="renderOrders()">
+        <select class="select" id="statusFilter" onchange="renderOrders()"><option value="">All statuses</option><option>New</option><option>Processing</option><option>Picking</option><option>Packing</option><option>Staged</option><option>Shipped</option><option>Blocked</option></select>
+        <select class="select" id="priorityFilter" onchange="renderOrders()"><option value="">All priority</option><option value="Priority">Priority only</option><option value="Standard">Standard only</option></select>
+        <button class="btn primary" onclick="simulateOrder()">+ Add demo order</button>
+      </div>
+      <div class="panel"><div class="panel-head"><h2>Order queue</h2><small id="orderCount"></small></div><div class="panel-body" style="padding-top:6px"><div id="ordersTable"></div></div></div>
+    </section>
+
+    <section id="inventory" class="page">
+      <div class="toolbar">
+        <input class="search" id="invSearch" placeholder="Search SKU or product…" oninput="renderInventory()">
+        <select class="select" id="warehouseFilter" onchange="renderInventory()"><option value="">All locations</option><option>Main</option><option>Secondary</option></select>
+      </div>
+      <div class="inventory-grid">
+        <div class="panel"><div class="panel-head"><h2>Inventory visibility</h2><small>Pickable stock is highlighted</small></div><div class="panel-body" style="padding-top:6px"><div id="inventoryTable"></div></div></div>
+        <div class="panel"><div class="panel-head"><h2>Transfer queue</h2><small>Secondary → Main</small></div><div class="panel-body" id="transferList"></div></div>
+      </div>
+    </section>
+
+    <section id="exceptions" class="page">
+      <div class="toolbar"><select class="select" id="exceptionFilter" onchange="renderExceptions()"><option value="">All exceptions</option><option value="Inventory">Inventory</option><option value="Fulfillment">Fulfillment</option></select><button class="btn primary" onclick="createException()">+ Log exception</button></div>
+      <div class="panel"><div class="panel-head"><h2>Exception queue</h2><small>Nothing should live only in chat or memory.</small></div><div class="panel-body" id="exceptionsTable"></div></div>
+    </section>
+
+    <section id="workflow" class="page">
+      <div class="panel"><div class="panel-head"><h2>Fulfillment workflow</h2><small>Designed around exception-driven work</small></div><div class="panel-body">
+        <div style="display:grid;gap:14px">
+          <div><b>1. Order received → processing</b><div class="muted" style="margin-top:4px">Office reviews order, validates SKU/variant, and selects courier based on cutoff, service level and cost.</div></div>
+          <div><b>2. Picking</b><div class="muted" style="margin-top:4px">Picker sees exact SKU, variant and source location. If main stock is insufficient, a transfer task is created instead of silently failing.</div></div>
+          <div><b>3. Packing → staging</b><div class="muted" style="margin-top:4px">Packing confirms quantity and order ID before label attachment. Staged boxes are assigned a visible pickup status.</div></div>
+          <div><b>4. Shipping</b><div class="muted" style="margin-top:4px">Courier pickup is tracked against the expected pickup window. Missed pickup becomes an exception.</div></div>
+          <div><b>5. Exception loop</b><div class="muted" style="margin-top:4px">Every blocker has an owner, severity and next action so unresolved problems remain visible.</div></div>
+        </div>
+      </div></div>
+    </section>
+  </main>
+</div>
+
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <div class="modal-head"><h3 id="modalTitle">Order details</h3><button class="close" onclick="closeModal()">×</button></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-actions"><button class="btn" onclick="closeModal()">Close</button><button class="btn primary" id="modalAction">Advance status</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const orders = [
+ {id:"ORD-1048",customer:"Maya Retail",sku:"WB-204",product:"Trail Bottle",variant:"750ml / Black",qty:2,priority:"Priority",status:"Picking",courier:"DHL",cutoff:"14:30",location:"Main"},
+ {id:"ORD-1049",customer:"Arun Stores",sku:"BG-118",product:"Daypack",variant:"18L / Olive",qty:1,priority:"Priority",status:"Blocked",courier:"FedEx",cutoff:"15:00",location:"Secondary"},
+ {id:"ORD-1050",customer:"Northstar Co.",sku:"MG-330",product:"Travel Mug",variant:"450ml / Steel",qty:3,priority:"Priority",status:"Packing",courier:"UPS",cutoff:"15:30",location:"Main"},
+ {id:"ORD-1051",customer:"Lumen Home",sku:"CB-412",product:"Cable Organizer",variant:"Large / Grey",qty:4,priority:"Standard",status:"Processing",courier:"DHL",cutoff:"17:00",location:"Main"},
+ {id:"ORD-1052",customer:"Kite Labs",sku:"WB-204",product:"Trail Bottle",variant:"750ml / Black",qty:1,priority:"Standard",status:"Staged",courier:"FedEx",cutoff:"16:30",location:"Main"},
+ {id:"ORD-1053",customer:"Peak Fitness",sku:"TR-552",product:"Training Towel",variant:"Large / Navy",qty:2,priority:"Standard",status:"Picking",courier:"UPS",cutoff:"18:00",location:"Main"},
+ {id:"ORD-1054",customer:"Nova Gifts",sku:"MG-330",product:"Travel Mug",variant:"450ml / Steel",qty:1,priority:"Standard",status:"New",courier:"DHL",cutoff:"18:00",location:"Main"},
+ {id:"ORD-1055",customer:"Blue Finch",sku:"BG-118",product:"Daypack",variant:"18L / Olive",qty:2,priority:"Standard",status:"Shipped",courier:"FedEx",cutoff:"12:30",location:"Main"}
+];
+const inventory = [
+ {sku:"WB-204",product:"Trail Bottle",variant:"750ml / Black",main:18,secondary:24,reorder:12},
+ {sku:"BG-118",product:"Daypack",variant:"18L / Olive",main:0,secondary:17,reorder:8},
+ {sku:"MG-330",product:"Travel Mug",variant:"450ml / Steel",main:9,secondary:6,reorder:10},
+ {sku:"CB-412",product:"Cable Organizer",variant:"Large / Grey",main:44,secondary:0,reorder:15},
+ {sku:"TR-552",product:"Training Towel",variant:"Large / Navy",main:7,secondary:10,reorder:12},
+ {sku:"HS-910",product:"Headlamp",variant:"400lm / Red",main:3,secondary:22,reorder:10}
+];
+const exceptions = [
+ {id:"EX-201",type:"Inventory",severity:"High",order:"ORD-1049",issue:"BG-118 stock unavailable in Main",action:"Transfer 1 unit from Secondary",owner:"Warehouse",status:"Open"},
+ {id:"EX-202",type:"Inventory",severity:"Medium",order:"ORD-1053",issue:"TR-552 below reorder level",action:"Review replenishment",owner:"Inventory",status:"Open"},
+ {id:"EX-203",type:"Fulfillment",severity:"High",order:"ORD-1048",issue:"Priority order approaching cutoff",action:"Complete picking by 14:30",owner:"Picking",status:"Open"},
+ {id:"EX-204",type:"Fulfillment",severity:"Medium",order:"ORD-1052",issue:"Staged box missing scan",action:"Locate and scan box",owner:"Packing",status:"Open"},
+ {id:"EX-205",type:"Fulfillment",severity:"Medium",order:"ORD-1055",issue:"Courier pickup confirmation pending",action:"Confirm handover",owner:"Dispatch",status:"Open"},
+ {id:"EX-206",type:"Fulfillment",severity:"High",order:"ORD-1049",issue:"Priority order blocked",action:"Resolve inventory transfer",owner:"Warehouse",status:"Open"},
+ {id:"EX-207",type:"Inventory",severity:"Low",order:"ORD-1050",issue:"MG-330 nearing reorder point",action:"Add to replenishment list",owner:"Inventory",status:"Open"}
+];
+const transfers = [{sku:"BG-118",qty:1,reason:"ORD-1049 priority order",status:"Ready to move"},{sku:"TR-552",qty:5,reason:"Replenishment",status:"Planned"}];
+
+const pages = {
+ dashboard:["Operations dashboard","A single view of today's fulfillment work."],
+ orders:["Orders","Search, prioritize and move orders through the fulfillment queue."],
+ inventory:["Inventory","See what is physically pickable and what needs to move between locations."],
+ exceptions:["Exceptions","Track blockers with an owner and next action."],
+ workflow:["Workflow","The operating model behind the application."]
+};
+function showPage(name){
+ document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+ document.getElementById(name).classList.add("active");
+ document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x.dataset.page===name));
+ document.getElementById("pageTitle").textContent=pages[name][0];
+ document.getElementById("pageSubtitle").textContent=pages[name][1];
+ if(name==="orders")renderOrders(); if(name==="inventory")renderInventory(); if(name==="exceptions")renderExceptions();
+}
+document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
+
+function badge(status){
+ const cls={Priority:"b-red",Standard:"b-blue",New:"b-blue",Processing:"b-purple",Picking:"b-amber",Packing:"b-purple",Staged:"b-green",Shipped:"b-green",Blocked:"b-red",High:"b-red",Medium:"b-amber",Low:"b-blue",Open:"b-red"}[status]||"b-blue";
+ return `<span class="badge ${cls}">${status}</span>`;
+}
+function renderWorkflow(){
+ const stages=["New","Processing","Picking","Packing","Staged","Shipped"];
+ document.getElementById("workflowCards").innerHTML=stages.map(s=>`<div class="stage"><div class="stage-title">${s}</div><div class="stage-num">${orders.filter(o=>o.status===s).length}</div></div>`).join("");
+}
+function renderPriority(){
+ const list=orders.filter(o=>o.priority==="Priority").slice(0,5);
+ document.getElementById("priorityTable").innerHTML=`<table><thead><tr><th>Order</th><th>Status</th><th>Cutoff</th><th></th></tr></thead><tbody>${list.map(o=>`<tr class="${o.status==='Blocked'?'priority':''}"><td><span class="order-id">${o.id}</span><br><span class="muted">${o.customer}</span></td><td>${badge(o.status)}</td><td>${o.cutoff}</td><td><button class="btn" onclick="openOrder('${o.id}')">Open</button></td></tr>`).join("")}</tbody></table>`;
+}
+function renderAttention(){
+ const open=exceptions.filter(e=>e.status==="Open").slice(0,5);
+ document.getElementById("attentionList").innerHTML=open.map(e=>`<div class="exception"><span class="dot ${e.severity==='Medium'?'amber':''}"></span><div><div class="ex-title">${e.issue}</div><div class="ex-meta">${e.order} · ${e.action}</div></div></div>`).join("");
+}
+function renderDashboard(){
+ document.getElementById("kpiOrders").textContent=248 + orders.filter(o=>o.id.startsWith("NEW")).length;
+ document.getElementById("kpiRisk").textContent=orders.filter(o=>o.priority==="Priority" && !["Shipped","Staged"].includes(o.status)).length+2;
+ document.getElementById("kpiReady").textContent=36;
+ document.getElementById("kpiExceptions").textContent=exceptions.filter(e=>e.status==="Open").length;
+ document.getElementById("exceptionCount").textContent=exceptions.filter(e=>e.status==="Open").length?` (${exceptions.filter(e=>e.status==="Open").length})`:"";
+ renderWorkflow();renderPriority();renderAttention();
+}
+function renderOrders(){
+ const q=(document.getElementById("orderSearch")?.value||"").toLowerCase();
+ const st=document.getElementById("statusFilter")?.value||"";
+ const pr=document.getElementById("priorityFilter")?.value||"";
+ const list=orders.filter(o=>(!q||`${o.id} ${o.customer} ${o.sku} ${o.product}`.toLowerCase().includes(q))&&(!st||o.status===st)&&(!pr||o.priority===pr));
+ document.getElementById("orderCount").textContent=`${list.length} shown`;
+ document.getElementById("ordersTable").innerHTML=list.length?`<table><thead><tr><th>Order</th><th>Item</th><th>Priority</th><th>Status</th><th>Courier</th><th>Cutoff</th><th></th></tr></thead><tbody>${list.map(o=>`<tr class="${o.priority==='Priority'?'priority':''}"><td><span class="order-id">${o.id}</span><br><span class="muted">${o.customer}</span></td><td>${o.product}<br><span class="muted">${o.variant} · Qty ${o.qty}</span></td><td>${badge(o.priority)}</td><td>${badge(o.status)}</td><td>${o.courier}</td><td>${o.cutoff}</td><td><button class="btn" onclick="openOrder('${o.id}')">Open</button></td></tr>`).join("")}</tbody></table>`:`<div class="empty">No orders match the current filters.</div>`;
+}
+function renderInventory(){
+ const q=(document.getElementById("invSearch")?.value||"").toLowerCase(), wh=document.getElementById("warehouseFilter")?.value||"";
+ const list=inventory.filter(i=>(!q||`${i.sku} ${i.product} ${i.variant}`.toLowerCase().includes(q)));
+ document.getElementById("inventoryTable").innerHTML=`<table><thead><tr><th>SKU / product</th><th>Main</th><th>Secondary</th><th>Pickable</th><th>Signal</th></tr></thead><tbody>${list.map(i=>{
+   const pick= i.main; const cls=pick===0?"stock-zero":pick<=i.reorder?"stock-low":"stock-good";
+   if(wh==="Main" && i.main===0) return "";
+   if(wh==="Secondary" && i.secondary===0) return "";
+   return `<tr><td><b>${i.sku}</b><br><span class="muted">${i.product} · ${i.variant}</span></td><td>${i.main}</td><td>${i.secondary}</td><td class="${cls}">${pick}</td><td>${pick===0?badge("Blocked"):pick<=i.reorder?badge("Low stock"):badge("Healthy")}</td></tr>`
+ }).join("")}</tbody></table>`;
+ document.getElementById("transferList").innerHTML=transfers.map(t=>`<div class="exception"><div><div class="ex-title">${t.sku} · ${t.qty} unit${t.qty>1?'s':''}</div><div class="ex-meta">${t.reason}</div></div><div style="margin-left:auto">${badge(t.status)}</div></div>`).join("");
+}
+function renderExceptions(){
+ const f=document.getElementById("exceptionFilter")?.value||"";
+ const list=exceptions.filter(e=>!f||e.type===f);
+ document.getElementById("exceptionsTable").innerHTML=`<table><thead><tr><th>Exception</th><th>Type</th><th>Severity</th><th>Owner</th><th>Next action</th><th>Status</th><th></th></tr></thead><tbody>${list.map(e=>`<tr><td><b>${e.id}</b><br><span class="muted">${e.order} · ${e.issue}</span></td><td>${e.type}</td><td>${badge(e.severity)}</td><td>${e.owner}</td><td>${e.action}</td><td>${badge(e.status)}</td><td><button class="btn" onclick="resolveException('${e.id}')">Resolve</button></td></tr>`).join("")}</tbody></table>`;
+}
+function openOrder(id){
+ const o=orders.find(x=>x.id===id); if(!o)return;
+ document.getElementById("modalTitle").textContent=`${o.id} · ${o.product}`;
+ document.getElementById("modalBody").innerHTML=`<div class="detail-grid">
+ <div class="detail"><label>Customer</label><div>${o.customer}</div></div><div class="detail"><label>Priority</label><div>${badge(o.priority)}</div></div>
+ <div class="detail"><label>SKU / Variant</label><div>${o.sku} · ${o.variant}</div></div><div class="detail"><label>Quantity</label><div>${o.qty}</div></div>
+ <div class="detail"><label>Current status</label><div>${badge(o.status)}</div></div><div class="detail"><label>Ship from</label><div>${o.location}</div></div>
+ <div class="detail"><label>Courier</label><div>${o.courier}</div></div><div class="detail"><label>Pickup cutoff</label><div>${o.cutoff}</div></div>
+ </div>
+ <div style="margin-top:18px;padding:12px;background:#f8fafc;border-radius:9px;font-size:13px"><b>Operator cue:</b> ${o.status==="Blocked"?"Resolve the inventory exception before sending this order to picking.":o.status==="Picking"?"Confirm the exact SKU and variant at the shelf before packing.":o.status==="Staged"?"Scan the box at the staging area and confirm courier handover.":"Move the order to the next workflow stage when the current step is complete."}</div>`;
+ document.getElementById("modal").classList.add("open");
+ document.getElementById("modalAction").onclick=()=>advanceOrder(o.id);
+}
+function closeModal(){document.getElementById("modal").classList.remove("open")}
+function advanceOrder(id){
+ const o=orders.find(x=>x.id===id); if(!o)return;
+ const next={New:"Processing",Processing:"Picking",Picking:"Packing",Packing:"Staged",Staged:"Shipped",Blocked:"Picking",Shipped:"Shipped"};
+ if(o.status==="Blocked"){o.status="Picking"; const ex=exceptions.find(e=>e.order===id&&e.status==="Open");if(ex)ex.status="Resolved";showToast(`${id} unblocked and moved to Picking`);}
+ else {o.status=next[o.status];showToast(`${id} moved to ${o.status}`);}
+ closeModal();renderDashboard();renderOrders();renderExceptions();
+}
+function resolveException(id){
+ const e=exceptions.find(x=>x.id===id);if(e){e.status="Resolved";showToast(`${id} marked resolved`);renderDashboard();renderExceptions();}
+}
+function simulateOrder(){
+ const n=1060+orders.filter(o=>o.id.startsWith("NEW")).length;
+ orders.push({id:`NEW-${n}`,customer:"Demo Customer",sku:"CB-412",product:"Cable Organizer",variant:"Large / Grey",qty:1,priority:"Priority",status:"New",courier:"DHL",cutoff:"16:45",location:"Main"});
+ showToast("Demo priority order added");renderDashboard();renderOrders();
+}
+function createException(){
+ const id=`EX-${208+exceptions.length-7}`;
+ exceptions.push({id,type:"Fulfillment",severity:"Medium",order:"NEW-"+(1060+orders.filter(o=>o.id.startsWith("NEW")).length-1),issue:"Demo exception logged by operator",action:"Review and assign next step",owner:"Operations",status:"Open"});
+ showToast("Exception logged");renderDashboard();renderExceptions();
+}
+function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200)}
+renderDashboard();renderOrders();renderInventory();renderExceptions();
+</script>
+</body>
+</html>
